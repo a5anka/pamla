@@ -31,110 +31,108 @@ threadList="1 3 6 9 12"
 NlistMatrix="300 600 900 1200 1500 1800"
 NlistMatrix2="2000 4000 6000 8000 10000 12000"
 NlistArray="1000000 2000000 5000000 10000000 20000000 50000000 100000000"
-NlistScalar=$NlistArray 
+NlistScalar=$NlistArray
 Slist1="31"   # strides
 Slist2="31 150"
 CC=gcc
 R=1
 for prog in $proglist
 do
-	SRC=$prog.c
-	EXEGOOD=$prog-good
-	EXEBAD_MA=$prog-badma
-	EXEBAD_FS=$prog-badfs
-	StrideFlag=1
-	SList=$Slist1
-	if [ $prog = "pmatrixmult" ]
-	then
-		type="MATRIX"
-		NList=$NlistMatrix
-		SList=
-		StrideFlag=0
-	elif [ $prog = "pmatrixcompare" ]
-	then
-		type="MATRIX"
-		NList=$NlistMatrix2
-		SList=
-		StrideFlag=0
-	elif [ $prog = "false1" ] || [ $prog = "psumscalar" ] || [ $prog = "padding" ]
-	then
-		type="SCALAR"
-		NList=$NlistScalar
-		StrideFlag=0
-	else 					#pdot, psumv, count have 1-D arrays
-		type="ARRAY"
-		NList=$NlistArray
-	fi
-	echo "# Running: prog=$prog : type=$type : ==========================================="
-	#echo "#Running $CFILE on $machine"
-	#
-	for N in $NList
-	do 
-		if [ $prog = "pmatrixmult" ] ; then
-			R=
-		elif [ $prog = "pmatrixcompare" ] ; then
-			R=5
-		elif [ $N -ge 50000000 ] ; then	# Repeat factor is low (50)
-			R=50
-		else						# Repeat factor should be higher
-			R=100
-		fi
-		#R=1
-		echo "# Running: prog=$prog: N=$N : R=$R : ++++++++++++++++++++++++++++++++++++++++++++"
-		MCMODEL=
-		# use -mcmodel=large with gcc when statically allocating large arrays > 2 GB
-		if [ $N -gt 100000000 ] && [ $type = "ARRAY" ]
-		then
-			MCMODEL="-mcmodel=large"
-			# exec time doesn't seem to get affected by this, but anyway...
-			#echo "MCMODEL=$MCMODEL, N=$N, type=$type, NList=$NList"
-		fi
-		for numThreads in $threadList
-		do
-			echo "# prog=$prog: N=$N : R=$R : numThreads=$numThreads : ---------------------"
-			echo "#"
-			gcc -DGOOD -DN=$N -DREPEAT=$R $SRC $MCMODEL -lpthread -lrt -o $EXEGOOD
-			#/usr/bin/time -f "# Good: Elapsed_time1(s)=%e" ./$EXEGOOD $numThreads > /dev/null
-			#sudo $PERF stat -x : -r 3 -e $events 
-			#sudo $PERF stat -r 3 -e $events ./$EXEGOOD $numThreads 
-			#./$EXEGOOD $numThreads
-			sudo $PERF stat -x : -r 3 -e $events ./$EXEGOOD $numThreads
-			rm ./$EXEGOOD
-			echo "#"
-			gcc -DBAD_FS -DN=$N -DREPEAT=$R $SRC $MCMODEL -lpthread -lrt -o $EXEBAD_FS
-			#./$EXEBAD_FS $numThreads
-			#./$EXEBAD_FS $numThreads
-			sudo $PERF stat -x : -r 3 -e $events ./$EXEBAD_FS $numThreads
-			rm ./$EXEBAD_FS
-			echo "#"
-			if [ $prog = "pmatrixcompare" ] ; then
-				gcc -DBAD_MA -DN=$N -DREPEAT=$R $SRC $MCMODEL -lpthread -lrt -o $EXEBAD_MA
-				#/usr/bin/time -f "# Bad: Elapsed_time1(s)=%e" ./$EXEBAD_MA $numThreads > /dev/null
-				#./$EXEBAD_MA $numThreads
-				sudo $PERF stat -x : -r 3 -e $events ./$EXEBAD_MA $numThreads
-				rm ./$EXEBAD_MA
-				echo "#"
-			fi
-			if [ $StrideFlag -eq 0  ]	# if [ $StrideFlag -eq 0 ],  [ !$StrideFlag ] 
-			then
-				continue
-			fi
-			for S in $SList
-			do
-				echo "# 	STRIDE=$S : ......................"
-				#gcc -DGOOD2 -DN=$N -DREPEAT=$R -DSTRIDE=$S -DCHECK $SRC $MCMODEL -lpthread -lrt -o $EXEGOOD-2
-				#gcc -DGOOD2 -DN=$N -DREPEAT=$R -DSTRIDE=$S $SRC $MCMODEL -lpthread -lrt -o $EXEGOOD-2
-				#/usr/bin/time -f "# Bad: Elapsed_time1(s)=%e" ./$EXEBAD $numThreads > /dev/null
-				#./$EXEGOOD-2 $numThreads
-				#rm ./$EXEGOOD-2
-				gcc -DBAD_MA -DN=$N -DREPEAT=$R -DSTRIDE=$S $SRC $MCMODEL -lpthread -lrt -o $EXEBAD_MA
-				#/usr/bin/time -f "# Bad: Elapsed_time1(s)=%e" ./$EXEBAD_MA $numThreads > /dev/null
-				#./$EXEBAD_MA $numThreads
-				sudo $PERF stat -x : -r 3 -e $events ./$EXEBAD_MA $numThreads
-				rm ./$EXEBAD_MA
-				echo "#"
-			done
-		done	
-	done
+    SRC=$prog.c
+    EXEGOOD=$prog-good
+    EXEBAD_MA=$prog-badma
+    EXEBAD_FS=$prog-badfs
+    StrideFlag=1
+    SList=$Slist1
+    if [ $prog = "pmatrixmult" ]
+    then
+        type="MATRIX"
+        NList=$NlistMatrix
+        SList=
+        StrideFlag=0
+    elif [ $prog = "pmatrixcompare" ]
+    then
+        type="MATRIX"
+        NList=$NlistMatrix2
+        SList=
+        StrideFlag=0
+    elif [ $prog = "false1" ] || [ $prog = "psumscalar" ] || [ $prog = "padding" ]
+    then
+        type="SCALAR"
+        NList=$NlistScalar
+        StrideFlag=0
+    else                                        #pdot, psumv, count have 1-D arrays
+        type="ARRAY"
+        NList=$NlistArray
+    fi
+    echo "# Running: prog=$prog : type=$type : ==========================================="
+    #echo "#Running $CFILE on $machine"
+    for N in $NList
+    do
+        if [ $prog = "pmatrixmult" ] ; then
+            R=
+        elif [ $prog = "pmatrixcompare" ] ; then
+            R=5
+        elif [ $N -ge 50000000 ] ; then	# Repeat factor is low (50)
+            R=50
+        else						# Repeat factor should be higher
+            R=100
+        fi
+        #R=1
+        echo "# Running: prog=$prog: N=$N : R=$R : ++++++++++++++++++++++++++++++++++++++++++++"
+        MCMODEL=
+        # use -mcmodel=large with gcc when statically allocating large arrays > 2 GB
+        if [ $N -gt 100000000 ] && [ $type = "ARRAY" ]
+        then
+            MCMODEL="-mcmodel=large"
+            # exec time doesn't seem to get affected by this, but anyway...
+            # echo "MCMODEL=$MCMODEL, N=$N, type=$type, NList=$NList"
+        fi
+        for numThreads in $threadList
+        do
+            echo "# prog=$prog: N=$N : R=$R : numThreads=$numThreads : ---------------------"
+            echo "#"
+            gcc -DGOOD -DN=$N -DREPEAT=$R $SRC $MCMODEL -lpthread -lrt -o $EXEGOOD
+            #/usr/bin/time -f "# Good: Elapsed_time1(s)=%e" ./$EXEGOOD $numThreads > /dev/null
+            #sudo $PERF stat -x : -r 3 -e $events
+            #sudo $PERF stat -r 3 -e $events ./$EXEGOOD $numThreads
+            #./$EXEGOOD $numThreads
+            sudo $PERF stat -x : -r 3 -e $events ./$EXEGOOD $numThreads
+            rm ./$EXEGOOD
+            echo "#"
+            gcc -DBAD_FS -DN=$N -DREPEAT=$R $SRC $MCMODEL -lpthread -lrt -o $EXEBAD_FS
+            #./$EXEBAD_FS $numThreads
+            #./$EXEBAD_FS $numThreads
+            sudo $PERF stat -x : -r 3 -e $events ./$EXEBAD_FS $numThreads
+            rm ./$EXEBAD_FS
+            echo "#"
+            if [ $prog = "pmatrixcompare" ] ; then
+                gcc -DBAD_MA -DN=$N -DREPEAT=$R $SRC $MCMODEL -lpthread -lrt -o $EXEBAD_MA
+                #/usr/bin/time -f "# Bad: Elapsed_time1(s)=%e" ./$EXEBAD_MA $numThreads > /dev/null
+                #./$EXEBAD_MA $numThreads
+                sudo $PERF stat -x : -r 3 -e $events ./$EXEBAD_MA $numThreads
+                rm ./$EXEBAD_MA
+                echo "#"
+            fi
+            if [ $StrideFlag -eq 0  ]	# if [ $StrideFlag -eq 0 ],  [ !$StrideFlag ]
+            then
+                continue
+            fi
+            for S in $SList
+            do
+                echo "#         STRIDE=$S : ......................"
+                #gcc -DGOOD2 -DN=$N -DREPEAT=$R -DSTRIDE=$S -DCHECK $SRC $MCMODEL -lpthread -lrt -o $EXEGOOD-2
+                #gcc -DGOOD2 -DN=$N -DREPEAT=$R -DSTRIDE=$S $SRC $MCMODEL -lpthread -lrt -o $EXEGOOD-2
+                #/usr/bin/time -f "# Bad: Elapsed_time1(s)=%e" ./$EXEBAD $numThreads > /dev/null
+                #./$EXEGOOD-2 $numThreads
+                #rm ./$EXEGOOD-2
+                gcc -DBAD_MA -DN=$N -DREPEAT=$R -DSTRIDE=$S $SRC $MCMODEL -lpthread -lrt -o $EXEBAD_MA
+                #/usr/bin/time -f "# Bad: Elapsed_time1(s)=%e" ./$EXEBAD_MA $numThreads > /dev/null
+                #./$EXEBAD_MA $numThreads
+                sudo $PERF stat -x : -r 3 -e $events ./$EXEBAD_MA $numThreads
+                rm ./$EXEBAD_MA
+                echo "#"
+            done
+        done
+    done
 done
-
