@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 #
 #	toarff.py	- converts  data files to ARFF
 #
