@@ -1,1 +1,3 @@
 *.log
+/sequential/data_csv
+/sequential/plot_data
