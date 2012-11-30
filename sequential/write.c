@@ -8,22 +8,22 @@
                             { perror("gettime( ):"); exit(EXIT_FAILURE); }
 #define         DEFAULT_STRIDE	31
 #ifdef          LINEAR1
-#define         MSG1		"# Write: Linear1    : Good   : "
+#define         MSG1		"Write:Linear1:Good:"
 #endif
 #ifdef          LINEAR2
-#define         MSG1		"# Write: Linear2    : Good   : "
+#define         MSG1		"Write:Linear2:Good:"
 #endif
 #ifdef          RANDOM1
-#define         MSG1		"# Write: Random1    : Bad-MA : "
+#define         MSG1		"Write:Random1:Bad-MA:"
 #endif
 #ifdef          RANDOM2
-#define         MSG1		"# Write: Random2    : Bad-MA : "
+#define         MSG1		"Write:Random2:Bad-MA:"
 #endif
 #ifdef          STRIDE
-#define         MSG1		"# Write: Stride="
+#define         MSG1		"Write:Stride="
 #endif
 //#define		MSG2		"N = %d : Elapsed time: %.3f msec (<%d> sec + <%d> nsec)\n"
-#define         MSG2		"N=%10d : DataSize=%6dKB : Elapsed(msec)=%.2f : "
+#define         MSG2		"N=%d:DataSize=%dKB:Elapsed(msec)=%.2f:"
 
 float elapsedTime(struct timespec *, struct timespec *, long *, long *);	// proto type
 
@@ -88,7 +88,7 @@ int main (int argc, char * argv[])
     elapsed_msec = elapsedTime(&t1, &t2, &sec, &nsec);
     printf(MSG1);
 #ifdef STRIDE
-    printf("%4d : Bad-MA : ", STRIDE);
+    printf("%d:Bad-MA:", STRIDE);
 #endif
     //printf(MSG2, N, elapsed_msec, (int) sec, (int) nsec);
     printf(MSG2, N, N*sizeof(TYPE)/1024, elapsed_msec);
