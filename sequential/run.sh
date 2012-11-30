@@ -8,7 +8,7 @@
 #
 ###################################################################
 
-PROGS="read readmodifywrite write dotproduct"
+PROGS="read readmodifywrite write dotproduct swap"
 CC=gcc
 type=double
 repeat=7

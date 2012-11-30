@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-PROGRAMS="read readmodifywrite write dotproduct"
+PROGRAMS="read readmodifywrite write dotproduct swap"
 CC=gcc
 DATATYPE=double
 REPEAT=7
