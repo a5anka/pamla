@@ -3,12 +3,14 @@
 ###################################################################
 #
 # To measure time of multiple commands using /usr/bin/time, try:
-#   /usr/bin/time sh -c 'cmd1 > /dev/null ; cmd2 > /dev/null' 
+#   /usr/bin/time sh -c 'cmd1 > /dev/null ; cmd2 > /dev/null'
 # can replace ' and && can replace ;
 #
 ###################################################################
 
 PROGS="read readmodifywrite write dotproduct swap"
+JAVA_PROGRAMS="Read DotProduct Write"
+JAVA_SOURCE_PATH="java"
 CC=gcc
 type=double
 repeat=7
@@ -27,9 +29,9 @@ STRIDELIST2="17 31 127 8191"
 STRIDELIST3="64 128 256 512 1024 2048 4096 8192"
 
 # on commit*, no difference among linear, random, strided versions until N=524288 (2^19)=> 4MB data
-start=1048576 	# = 2^20;  was 524288 = 2^19		
+start=1048576   # = 2^20;  was 524288 = 2^19
 mult=2
-end=268435456	# = 2^28; (was 134217728 = 2^27) 			
+end=268435456	# = 2^28; (was 134217728 = 2^27)
 # with doubles (8 byte), data size = 4KB; up to 32 KB fits in L1 DCache
 # for doubles (8 byte), e.g. size of each Array=8* 2^^28=8*268,435,456=8* 256*1024*1024 =>2GB
 #
@@ -45,52 +47,83 @@ do
     #echo "# Running with N=$i =========================================================="
     for PROG in $PROGS
     do
-	SOURCE=$PROG.c
-	EXE=$PROG
-	MCMODEL=
-	if [ $i -gt 100000000 ] # && [ $PROG = "dotproduct" ]
-	then	# when memory >= 2GB will need to compiled with "-mcmodel=large" flag
-	    MCMODEL="-mcmodel=large"
-	fi
+        SOURCE=$PROG.c
+        EXE=$PROG
+        MCMODEL=
+        if [ $i -gt 100000000 ] # && [ $PROG = "dotproduct" ]
+        then	# when memory >= 2GB will need to compiled with "-mcmodel=large" flag
+            MCMODEL="-mcmodel=large"
+        fi
 
-	#echo "# Running $PROG=========================================================="
-	echo "# Running $PROG with N=$i : MCMODEL=<$MCMODEL>---------------------------------------"
-	#gcc -DN=$i -DREPEAT=$repeat -DLINEAR1 -DWARMUP -DTYPE=$type $SOURCE $MCMODEL -lrt -o $EXE-linear
-	#gcc -DN=$i -DREPEAT=$repeat -DLINEAR1 -DTYPE=$type $SOURCE $MCMODEL -lrt -o $EXE-linear
-	#sudo $PERF stat -r 3 -x : -e $events  ./$EXE-linear
-	#/usr/bin/time -f "# Linear: Elapsed_time1(s)=%e" ./$EXE-linear
-	#/usr/bin/time -f "# Linear: Elapsed_time1(s)=%e" sh -c 'cmd1 > /dev/null ; cmd2 > /dev/null'
-	#./$EXE-linear 
-	#rm -f $EXE-linear
-	#echo "#"
+        #echo "# Running $PROG=========================================================="
+        echo "# Running $PROG with N=$i : MCMODEL=<$MCMODEL>---------------------------------------"
+        #gcc -DN=$i -DREPEAT=$repeat -DLINEAR1 -DWARMUP -DTYPE=$type $SOURCE $MCMODEL -lrt -o $EXE-linear
+        #gcc -DN=$i -DREPEAT=$repeat -DLINEAR1 -DTYPE=$type $SOURCE $MCMODEL -lrt -o $EXE-linear
+        #sudo $PERF stat -r 3 -x : -e $events  ./$EXE-linear
+        #/usr/bin/time -f "# Linear: Elapsed_time1(s)=%e" ./$EXE-linear
+        #/usr/bin/time -f "# Linear: Elapsed_time1(s)=%e" sh -c 'cmd1 > /dev/null ; cmd2 > /dev/null'
+        #./$EXE-linear
+        #rm -f $EXE-linear
+        #echo "#"
         echo "PROGRAM=$PROG:N=$i:ALGO=LINEAR2:TYPE=GOOD"
-	gcc -DN=$i -DREPEAT=$repeat -DLINEAR2 -DTYPE=$type $SOURCE $MCMODEL -lrt -o $EXE-linear2
-	#./$EXE-linear2
-	sudo $PERF stat -r 3 -x : -e $events  ./$EXE-linear2 > /dev/null
-	rm -f $EXE-linear2
-	echo "#"
-	#echo "#ooooooooooo Linear-W-Opt"
-	#gcc -DN=$i -DREPEAT=$repeat -DWARMUP -DLINEAR -DTYPE=$type -O3 $SOURCE $MCMODEL -lrt -o $EXE-linopt
-	#echo "#"
+        gcc -DN=$i -DREPEAT=$repeat -DLINEAR2 -DTYPE=$type $SOURCE $MCMODEL -lrt -o $EXE-linear2
+        #./$EXE-linear2
+        sudo $PERF stat -r 3 -x : -e $events  ./$EXE-linear2 > /dev/null
+        rm -f $EXE-linear2
+        echo "#"
+        #echo "#ooooooooooo Linear-W-Opt"
+        #gcc -DN=$i -DREPEAT=$repeat -DWARMUP -DLINEAR -DTYPE=$type -O3 $SOURCE $MCMODEL -lrt -o $EXE-linopt
+        #echo "#"
         echo "PROGRAM=$PROG:N=$i:ALGO=RANDOM2:TYPE=BAD"
-	gcc -DN=$i -DREPEAT=$repeat -DRANDOM2 -DTYPE=$type $SOURCE $MCMODEL -lrt -o $EXE-random2
-	#./$EXE-random2
-	sudo $PERF stat -r 3 -x : -e $events  ./$EXE-random2 > /dev/null
-	rm -f $EXE-random2
-	echo "#"
-	#access with strides 
-	for j in $STRIDELIST
-	do
+        gcc -DN=$i -DREPEAT=$repeat -DRANDOM2 -DTYPE=$type $SOURCE $MCMODEL -lrt -o $EXE-random2
+        #./$EXE-random2
+        sudo $PERF stat -r 3 -x : -e $events  ./$EXE-random2 > /dev/null
+        rm -f $EXE-random2
+        echo "#"
+        #access with strides
+        for j in $STRIDELIST
+        do
             echo "PROGRAM=$PROG:N=$i:ALGO=STRIDE-$j:TYPE=BAD"
-	    gcc -DN=$i -DREPEAT=$repeat -DSTRIDE=$j -DTYPE=$type $SOURCE $MCMODEL -lrt -o $EXE-stride$j
-	    #./$EXE-stride$j
-	    sudo $PERF stat -r 3 -x : -e $events  ./$EXE-stride$j > /dev/null
-	    rm -f $EXE-stride$j
-	    echo "#"
-	done
-	#echo "#done N=$i============================================"
-	#i=$(( $i * $mult ))	
+            gcc -DN=$i -DREPEAT=$repeat -DSTRIDE=$j -DTYPE=$type $SOURCE $MCMODEL -lrt -o $EXE-stride$j
+            #./$EXE-stride$j
+            sudo $PERF stat -r 3 -x : -e $events  ./$EXE-stride$j > /dev/null
+            rm -f $EXE-stride$j
+            echo "#"
+        done
+        #echo "#done N=$i============================================"
+        #i=$(( $i * $mult ))
+    done
+
+    for PROGRAM in $JAVA_PROGRAMS
+    do
+        pushd $JAVA_SOURCE_PATH > /dev/null
+        EXE=${PROGRAM}Linear2
+        SOURCE=${EXE}.java
+        echo "PROGRAM=$PROGRAM:N=$i:ALGO=LINEAR2:TYPE=GOOD"
+        javac $SOURCE
+        sudo $PERF stat -r 3 -x : -e $events java -Xmx2048m -ea $EXE $i $repeat  > /dev/null
+        rm -f $EXE.class
+        echo "#"
+
+        EXE=${PROGRAM}Random2
+        SOURCE=${EXE}.java
+        echo "PROGRAM=$PROGRAM:N=$i:ALGO=Random2:TYPE=BAD"
+        javac $SOURCE
+        sudo $PERF stat -r 3 -x : -e $events java -Xmx2048m -ea $EXE $i $repeat > /dev/null
+        rm -f $EXE.class
+        echo "#"
+
+        for j in $STRIDELIST
+        do
+            EXE=${PROGRAM}Stride
+            SOURCE=${EXE}.java
+            echo "PROGRAM=$PROGRAM:N=$i:ALGO=Stride-$j:TYPE=BAD"
+            javac $SOURCE
+            sudo $PERF stat -r 3 -x : -e $events java -Xmx2048m -ea $EXE $i $repeat $j > /dev/null
+            rm -f $EXE.class
+            echo "#"
+        done
+        popd > /dev/null
     done
     i=$(( $i * $mult ))
 done
-

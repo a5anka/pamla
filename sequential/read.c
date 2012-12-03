@@ -91,15 +91,11 @@ int main (int argc, char * argv[])
 #endif
     //printf(MSG2, N, elapsed_msec, (int) sec, (int) nsec);
     printf(MSG2, N, N*sizeof(TYPE)/1024, elapsed_msec);
-    //#ifdef WARMUP
-    //printf(" -- WARM\n");
-    //#else
     printf("\n");
-    //#endif
 
     return 0;
 }
-//-----------------------------------------------
+
 float elapsedTime(struct timespec *begin, struct timespec *end, long *sec, long *nsec)
 {
     if (end->tv_nsec < begin->tv_nsec) {
@@ -111,5 +107,4 @@ float elapsedTime(struct timespec *begin, struct timespec *end, long *sec, long 
         *sec  = end->tv_sec - begin->tv_sec;
     }
     return (float) (*sec) * 1000 + ((float) (*nsec)) / 1000000;
-
 }

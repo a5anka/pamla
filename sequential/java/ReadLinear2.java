@@ -1,22 +1,20 @@
 /*********************************************************************
- *  Compilation:  javac ReadRandom.java
- *  Execution:    java ReadRandom N REPEAT
+ *  Compilation:  javac ReadLinear2.java
+ *  Execution:    java ReadLinear2 N REPEAT
  *
- *  Reads integres from array using a random algorithm
+ *  Read integers from array using a linear algorithm
  *
  *********************************************************************/
 
-public class ReadRandom {
+public class ReadLinear2 {
 
     public static double[] A;
     public final static int DOUBLE_SIZE = 8;
-    public final static int DEFAULT_STRIDE = 31;
 
     public static void main(String[] args) {
         assert args.length == 2;
 
-        int n = Integer.parseInt(args[0]), k;
-        int stride = DEFAULT_STRIDE;
+        int n = Integer.parseInt(args[0]);
         int repeat = Integer.parseInt(args[1]);
         int mask = n - 1;
         long sum2 = 0;
@@ -33,16 +31,16 @@ public class ReadRandom {
         long startTime = System.currentTimeMillis();
 
         for (int i = 0; i < repeat; i++) {
-            for (int j = 0; j < n; j++){
-                k = ((j+523) * 253573 ) & mask;
-                sum2 += k + j * stride + j;
-                sum += A[k];
-            }
+            for (int j = 0; j < n; j++)
+                {
+                    sum2 += ((j+523) * 253573 ) & mask;
+                    sum += A[j];
+                }
         }
 
         long endTime   = System.currentTimeMillis();
 
-        System.out.format("Read:Random:BAD:N=%d:DataSize=%dKB:Elapsed(msec)=%d\n",n ,dataSize, endTime - startTime);
+        System.out.format("Read:Linear2:Good:N=%d:DataSize=%dKB:Elapsed(msec)=%d\n",n ,dataSize, endTime - startTime);
 
     }
 }

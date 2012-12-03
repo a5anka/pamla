@@ -2,7 +2,7 @@
  *  Compilation:  javac ReadStride.java
  *  Execution:    java ReadStride N REPEAT
  *
- *  Reads integres from array using a random algorithm
+ *  Read integers from array using a Stride algorithm
  *
  *********************************************************************/
 
