@@ -1,4 +1,5 @@
 *.log
+*.class
 /sequential/data_csv
 /sequential/plot_data
 /sequential/train_data
