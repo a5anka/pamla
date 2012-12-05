@@ -33,10 +33,10 @@ public class WriteStride {
 			}
 
 		endTime = System.currentTimeMillis();
-		System.out.print("# Write: Stride=");
-		System.out.format("%4d : Bad-MA : ", STRIDE);
-		System.out.println("N=" + N + " : DataSize=" + (N * 8 / 1024)
-				+ "KB : Elapsed(msec)= : " + (endTime - startTime));
+		System.out.print("Write:Stride-");
+		System.out.format("%d:Bad-MA:", STRIDE);
+		System.out.println("N=" + N + ":DataSize=" + (N * 8 / 1024)
+				+ "KB:Elapsed(msec)=" + (endTime - startTime));
 
 	}
 

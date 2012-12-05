@@ -44,6 +44,6 @@ public class DotProductLinear2 {
 	            sum += A[j] * B[j];
 	        }
 	    endtime=System.currentTimeMillis();
-	    System.out.format("N=%d:DataSize=%dKB:Elapsed(msec)=%d\n",N,((8*N)/1024)*2,(endtime-starttime));
+	    System.out.format("DotProduct:Linear2:GOOD:N=%d:DataSize=%dKB:Elapsed(msec)=%d\n",N,((8*N)/1024)*2,(endtime-starttime));
 	}
 }

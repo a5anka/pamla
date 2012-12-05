@@ -31,9 +31,9 @@ public class WriteRandom2 {
 			}
 
 		endTime = System.currentTimeMillis();
-		System.out.println("# Write: Random2    : Bad-MA   : ");
-		System.out.println("N=" + N + " : DataSize=" + (N * 8 / 1024)
-				+ "KB : Elapsed(msec)= : " + (endTime - startTime));
+		System.out.print("Write:Random2:Bad-MA:");
+		System.out.println("N=" + N + ":DataSize=" + (N * 8 / 1024)
+				+ "KB:Elapsed(msec)=:" + (endTime - startTime));
 
 	}
 

@@ -39,6 +39,6 @@ public class DotProductRandom2 {
 		            sum += A[k] * B[k];
 		        }
 		    endtime=System.currentTimeMillis();
-		    System.out.format("N=%d:DataSize=%dKB:Elapsed(msec)=%d\n",N,((8*N)/1024)*2,(endtime-starttime));
+		    System.out.format("DotProduct:Random2:BAD:N=%d:DataSize=%dKB:Elapsed(msec)=%d\n",N,((8*N)/1024)*2,(endtime-starttime));
 		}
 	}

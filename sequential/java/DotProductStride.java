@@ -48,6 +48,6 @@ public class DotProductStride {
 	                sum += A[k] * B[k] ;
 	            }
 	    endtime=System.currentTimeMillis();
-	    System.out.format("N=%d:DataSize=%dKB:Elapsed(msec)=%d\n",N,((8*N)/1024)*2,(endtime-starttime));
+	    System.out.format("DotProduct:Stride:BAD:N=%d:DataSize=%dKB:Elapsed(msec)=%d\n",N,((8*N)/1024)*2,(endtime-starttime));
 	}
 }

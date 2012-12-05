@@ -29,9 +29,9 @@ public class WriteLinear2 {
 			}
 
 		endTime = System.currentTimeMillis();
-		System.out.println("# Write: Linear2    : Good   : ");
-		System.out.println("N=" + N + " : DataSize=" + (N * 8 / 1024)
-				+ "KB : Elapsed(msec)= : " + (endTime - startTime));
+		System.out.print("Write:Linear2:Good:");
+		System.out.println("N=" + N + ":DataSize=" + (N * 8 / 1024)
+				+ "KB:Elapsed(msec)=" + (endTime - startTime));
 
 	}
 
