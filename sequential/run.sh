@@ -9,8 +9,6 @@
 ###################################################################
 
 PROGS="read readmodifywrite write dotproduct swap"
-JAVA_PROGRAMS="Read DotProduct Write"
-JAVA_SOURCE_PATH="java"
 CC=gcc
 type=double
 repeat=7
@@ -94,36 +92,5 @@ do
         #i=$(( $i * $mult ))
     done
 
-    for PROGRAM in $JAVA_PROGRAMS
-    do
-        pushd $JAVA_SOURCE_PATH > /dev/null
-        EXE=${PROGRAM}Linear2
-        SOURCE=${EXE}.java
-        echo "PROGRAM=$PROGRAM:N=$i:ALGO=LINEAR2:TYPE=GOOD"
-        javac $SOURCE
-        sudo $PERF stat -r 3 -x : -e $events java -Xmx2048m -ea $EXE $i $repeat  > /dev/null
-        rm -f $EXE.class
-        echo "#"
-
-        EXE=${PROGRAM}Random2
-        SOURCE=${EXE}.java
-        echo "PROGRAM=$PROGRAM:N=$i:ALGO=Random2:TYPE=BAD"
-        javac $SOURCE
-        sudo $PERF stat -r 3 -x : -e $events java -Xmx2048m -ea $EXE $i $repeat > /dev/null
-        rm -f $EXE.class
-        echo "#"
-
-        for j in $STRIDELIST
-        do
-            EXE=${PROGRAM}Stride
-            SOURCE=${EXE}.java
-            echo "PROGRAM=$PROGRAM:N=$i:ALGO=Stride-$j:TYPE=BAD"
-            javac $SOURCE
-            sudo $PERF stat -r 3 -x : -e $events java -Xmx2048m -ea $EXE $i $repeat $j > /dev/null
-            rm -f $EXE.class
-            echo "#"
-        done
-        popd > /dev/null
-    done
     i=$(( $i * $mult ))
 done
