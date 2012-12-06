@@ -1,5 +1,3 @@
 *.log
 *.class
-data_csv
-plot_data
-train_data
+/sequential/data
