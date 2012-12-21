@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+DATAFILE=data/train_data
 NUMBER_PERFEVENTS=16
 
 LINES=`expr $NUMBER_PERFEVENTS + 1`
@@ -27,7 +28,7 @@ echo '@relation performance_data_for_sequential_memory_access
 @attribute r40cb numeric
 @data'
 
-sed -e '/^#/d' -e 's/TYPE=\([^:]*\)/\1/g' train_data | \
+sed -e '/^#/d' -e 's/TYPE=\([^:]*\)/\1/g' $DATAFILE | \
 
 awk -F : '{
 if ($1 !~ "PROGRAM.*")
