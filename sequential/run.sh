@@ -72,7 +72,7 @@ do
         #echo "#ooooooooooo Linear-W-Opt"
         #gcc -DN=$i -DREPEAT=$repeat -DWARMUP -DLINEAR -DTYPE=$type -O3 $SOURCE $MCMODEL -lrt -o $EXE-linopt
         #echo "#"
-        echo "PROGRAM=$PROG:N=$i:ALGO=RANDOM2:TYPE=BAD"
+        echo "PROGRAM=$PROG:N=$i:ALGO=RANDOM2:TYPE=BAD-MA"
         gcc -DN=$i -DREPEAT=$repeat -DRANDOM2 -DTYPE=$type $SOURCE $MCMODEL -lrt -o $EXE-random2
         #./$EXE-random2
         sudo $PERF stat -r 3 -x : -e $events  ./$EXE-random2 > /dev/null
@@ -81,7 +81,7 @@ do
         #access with strides
         for j in $STRIDELIST
         do
-            echo "PROGRAM=$PROG:N=$i:ALGO=STRIDE-$j:TYPE=BAD"
+            echo "PROGRAM=$PROG:N=$i:ALGO=STRIDE-$j:TYPE=BAD-MA"
             gcc -DN=$i -DREPEAT=$repeat -DSTRIDE=$j -DTYPE=$type $SOURCE $MCMODEL -lrt -o $EXE-stride$j
             #./$EXE-stride$j
             sudo $PERF stat -r 3 -x : -e $events  ./$EXE-stride$j > /dev/null

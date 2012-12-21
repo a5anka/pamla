@@ -8,22 +8,23 @@ echo '@relation performance_data_for_sequential_memory_access
 %
 %       16 attributes for each data instance
 %
-@attribute status {GOOD, BAD}
-@attribute r03c numeric
-@attribute r1a2 numeric
-@attribute r4f2e numeric
-@attribute r412e numeric
-@attribute r151 numeric
-@attribute r451 numeric
-@attribute r148 numeric
-@attribute r108 numeric
-@attribute r1008 numeric
-@attribute r149 numeric
-@attribute r1049 numeric
-@attribute raf2 numeric
-@attribute r7f1 numeric
-@attribute r324 numeric
-@attribute r80f0 numeric
+@attribute status {GOOD, BAD-MA}
+@attribute r00c0 numeric
+@attribute r0149 numeric
+@attribute r0151 numeric
+@attribute r02a2 numeric
+@attribute r0126 numeric
+@attribute r0227 numeric
+@attribute r0224 numeric
+@attribute r08a2 numeric
+@attribute r01b0 numeric
+@attribute r20f0 numeric
+@attribute r02f1 numeric
+@attribute r01f2 numeric
+@attribute r01b8 numeric
+@attribute r02b8 numeric
+@attribute r04b8 numeric
+@attribute r40cb numeric
 @data'
 
 sed -e '/^#/d' -e 's/TYPE=\([^:]*\)/\1/g' train_data | \
