@@ -22,10 +22,9 @@ packages["swaptions"]="apps"
 packages["vips"]="apps"
 packages["x264"]="apps"
 
-inputs=(test simdev simsmall simmedium simlarge) # add native 
+inputs=(simsmall simmedium simlarge) # add native 
 
-# TODO iterate over set of thread numbers
-NTHREADS=1
+THREAD_LIST=(1 4 8 12)
 
 perfEvents="r00c0,r0149,r0151,r02a2,r0126,r0227,r0224,r08a2,r01b0,r20f0,r02f1,r01f2,r01b8,r02b8,r04b8,r40cb"
 
@@ -38,20 +37,28 @@ for program in ${!packages[@]}; do
     pushd "${bmrundir}" > /dev/null
 
     for input in ${inputs[@]}; do
-        echo "# Extracting $input for $program"
         bminput="${bminputdir}/input_${input}.tar"
         if [ -f $bminput ]; then
             ${UNTAR} ${bminput} > /dev/null
         fi
 
-        source ${bmparsecdir}/${input}.runconf
-        bmexec_suffix=${run_exec}
-        bminstdir="${bmdir}/inst/${PARSECPLAT}"
-        bmexec="${bminstdir}/${bmexec_suffix}"
-        bmexec_args=${run_args}
-        $PERF stat -x : -r 3 -e $perfEvents $bmexec $bmexec_args > /dev/null
+        for threads in ${THREAD_LIST[@]}; do
+            if [ $threads -eq 12 ] && [ $program == "fluidanimate" ]; then
+                continue
+            fi
 
-        echo
+            NTHREADS=$threads
+
+            source ${bmparsecdir}/${input}.runconf
+            bmexec_suffix=${run_exec}
+            bminstdir="${bmdir}/inst/${PARSECPLAT}"
+            bmexec="${bminstdir}/${bmexec_suffix}"
+            bmexec_args=${run_args}            
+
+            echo "#PROGRAM=$program:INPUT=$input:NTHREADS=$NTHREADS"
+            $PERF stat -x : -r 3 -e $perfEvents $bmexec $bmexec_args > /dev/null
+            echo 
+        done
     done
     
     popd > /dev/null
