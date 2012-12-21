@@ -12,17 +12,17 @@ packages["blackscholes"]="apps"
 packages["bodytrack"]="apps"
 packages["canneal"]="kernels"
 packages["dedup"]="kernels"
-packages["facesim"]="apps"
+packages["facesim"]="apps" # No test data
 packages["ferret"]="apps"
 packages["fluidanimate"]="apps"
 packages["freqmine"]="apps"
-packages["raytrace"]="apps"
+packages["raytrace"]="apps" # Not building access(x,y) method missing
 packages["streamcluster"]="kernels"
 packages["swaptions"]="apps"
 packages["vips"]="apps"
-packages["x264"]="apps"
+packages["x264"]="apps" # Gives segmentation faults
 
-inputs=(simsmall simmedium simlarge) # add native 
+inputs=(simsmall simmedium simlarge) # add native
 
 THREAD_LIST=(1 4 8 12)
 
@@ -53,14 +53,14 @@ for program in ${!packages[@]}; do
             bmexec_suffix=${run_exec}
             bminstdir="${bmdir}/inst/${PARSECPLAT}"
             bmexec="${bminstdir}/${bmexec_suffix}"
-            bmexec_args=${run_args}            
+            bmexec_args=${run_args}
 
             echo "#PROGRAM=$program:INPUT=$input:NTHREADS=$NTHREADS"
             $PERF stat -x : -r 3 -e $perfEvents $bmexec $bmexec_args > /dev/null
-            echo 
+            echo
         done
     done
-    
+
     popd > /dev/null
     rm -r $bmrundir
 
