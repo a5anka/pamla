@@ -28,15 +28,19 @@ THREAD_LIST=(1 4 8 12)
 
 perfEvents="r00c0,r0149,r0151,r02a2,r0126,r0227,r0224,r08a2,r01b0,r20f0,r02f1,r01f2,r01b8,r02b8,r04b8,r40cb"
 
+if [ -d $bmrundir ]; then
+    rm -r $bmrundir
+fi
+
 for program in ${!packages[@]}; do
     bmdir="${PARSEC_DIR}/${benchdir}/${packages[$program]}/${program}"
     bminputdir="${bmdir}/inputs"
     bmparsecdir="${bmdir}/parsec"
 
-    mkdir -p $bmrundir
-    pushd "${bmrundir}" > /dev/null
-
     for input in ${inputs[@]}; do
+        mkdir -p $bmrundir
+        pushd "${bmrundir}" > /dev/null
+
         bminput="${bminputdir}/input_${input}.tar"
         if [ -f $bminput ]; then
             ${UNTAR} ${bminput} > /dev/null
@@ -59,9 +63,9 @@ for program in ${!packages[@]}; do
             $PERF stat -x : -r 3 -e $perfEvents $bmexec $bmexec_args > /dev/null
             echo
         done
+
+        popd > /dev/null
+        rm -r $bmrundir
+
     done
-
-    popd > /dev/null
-    rm -r $bmrundir
-
 done
