@@ -22,7 +22,7 @@ packages["swaptions"]="apps"
 packages["vips"]="apps"
 # packages["x264"]="apps" Gives segmentation faults
 
-inputs=(simsmall simmedium simlarge) # add native 
+inputs=(simsmall simmedium simlarge) # add native
 THREAD_LIST=(1 4 8 12)
 perfEvents="r00c0,r0149,r0151,r02a2,r0126,r0227,r0224,r08a2,r01b0,r20f0,r02f1,r01f2,r01b8,r02b8,r04b8,r40cb"
 
@@ -51,11 +51,11 @@ for program in ${!packages[@]}; do
             bmexec_suffix=${run_exec}
             bminstdir="${bmdir}/inst/${PARSECPLAT}"
             bmexec="${bminstdir}/${bmexec_suffix}"
-            bmexec_args=${run_args}            
+            bmexec_args=${run_args}
 
             echo "#PROGRAM=$program:INPUT=$input:NTHREADS=$NTHREADS"
             time $bmexec $bmexec_args > /dev/null
-            echo 
+            echo
         done
     done
 
