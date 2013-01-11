@@ -31,10 +31,10 @@ for program in ${!packages[@]}; do
     bminputdir="${bmdir}/inputs"
     bmparsecdir="${bmdir}/parsec"
 
-    mkdir -p $bmrundir
-    pushd "${bmrundir}" > /dev/null
-
     for input in ${inputs[@]}; do
+        mkdir -p $bmrundir
+        pushd "${bmrundir}" > /dev/null
+
         bminput="${bminputdir}/input_${input}.tar"
         if [ -f $bminput ]; then
             ${UNTAR} ${bminput} > /dev/null
@@ -57,9 +57,9 @@ for program in ${!packages[@]}; do
             time $bmexec $bmexec_args > /dev/null
             echo
         done
+
+        popd > /dev/null
+        rm -r $bmrundir
+
     done
-
-    popd > /dev/null
-    rm -r $bmrundir
-
 done
