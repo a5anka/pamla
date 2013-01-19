@@ -1,11 +1,11 @@
-/************************************************************************
+/****************************************************************************
  * counting.c - A simple counting parallel program to demo false sharing
  *
- *  Compilation: gcc -DN=<array_size> -DREPEAT=<n> -D[GOOD|BAD] counting.c \
+ * Compilation: gcc -DN=<array_size> -DREPEAT=<n> -D[GOOD|BAD] counting.c \
  *               -lpthread -lrt -o count
  *
  * Execution: ./count <numthreads>
- ************************************************************************/
+ ****************************************************************************/
 
 #include <pthread.h>
 #include <stdio.h>
@@ -25,9 +25,14 @@
 #define REPEAT 5
 #endif
 
+#ifndef PHASES
+#define PHASES 9
+#endif
+
 #define CACHELINE 64 // size of cacheline is 64 bytes
-#define DATASIZE 4 // int=4 bytes, long long is 8 bytes
+#define DATASIZE 4   // int=4 bytes, long long is 8 bytes
 #define MAXTHREADS CACHELINE/DATASIZE // max # parallel threads to sum (with false sharing)
+
 #define GET_TIME(x); if (clock_gettime(CLOCK_MONOTONIC, &(x)) < 0) \
                         { perror("clock_gettime( ):"); exit(EXIT_FAILURE); }
 
@@ -42,7 +47,7 @@
 void *pcountGood(void *vargp);
 void *pcountBadFS(void *vargp);
 void *pcountBadMA(void *vargp);
-float elapsed_time_msec(struct timespec *, struct timespec *, long *, long *);  // proto type
+float elapsed_time_msec(struct timespec *, struct timespec *, long *, long *);
 
 // Global shared variables
 int count[MAXTHREADS];
@@ -57,7 +62,6 @@ int main(int argc, char **argv)
    struct timespec      t0, t1, t2, t3;
    unsigned long        sec, nsec;
    float                comp_time, total_time;  // in milli seconds
-   time_t ltime;
    char *typeName;
 
 
@@ -72,7 +76,7 @@ int main(int argc, char **argv)
       exit(0);
    }
 
-   for (j = 0; j < 9; ++j)
+   for (j = 0; j < PHASES; ++j)
       {
          int type = j % 3;
          if (type == GOOD)
@@ -87,12 +91,11 @@ int main(int argc, char **argv)
             {
                typeName = "BADMA";
             }
-         ltime=time(NULL);
 
-         printf ("%d. Starting %s phase at %s", j + 1, typeName,
-                 asctime(localtime(&ltime)) );
          for (i=0; i < N; i++)
-            x[i] = random();          // not optimized
+            x[i] = random(); // not optimized
+
+         printf ("%d:PHASE=%s:START=%d:", j + 1, typeName, time(NULL));
 
          GET_TIME(t1);
          for (i = 0; i < numthreads; i++) {
@@ -133,12 +136,13 @@ int main(int argc, char **argv)
                continue;
             }
 
-         printf ("Time: %f\n", comp_time);
+         printf ("END=%d:Time=%f\n", time(NULL), comp_time);
          //printf(MSG, N, numthreads, comp_time, 100.0*comp_time/total_time);
       }
    return 0;
 }
-//------------------------------------------
+
+// Good version
 void * pcountGood(void *p)
 {
    int          myid = *((int *)p);
@@ -156,7 +160,7 @@ void * pcountGood(void *p)
    }
    count[myid] = mycount[myid];
    mycount[myid] = n;
-   totalcount += count[myid];           // ideally should use locks
+   totalcount += count[myid]; // ideally should use locks
 }
 
 // BAD FS version
@@ -172,11 +176,11 @@ void * pcountBadFS(void *p)
       for (i = start; i < end; i++) {
          n += (start + (i * STRIDE + k))% 2;
          if (x[i] % 2 == 0)
-            count[myid]++;      // causes false sharing among threads
+            count[myid]++; // causes false sharing among threads
       }
    }
    mycount[myid] = n;
-   totalcount += count[myid];           // ideally should use locks
+   totalcount += count[myid]; // ideally should use locks
 }
 
 // BAD MA version
@@ -190,7 +194,7 @@ void * pcountBadMA(void *p)
 
    for (j = 0; j < REPEAT; ++j) {
       len = end - start;
-      for (k=0; k < STRIDE; k++) {      // bad memory access (strided)
+      for (k=0; k < STRIDE; k++) { // bad memory access (strided)
          for (i = 0; i < len/STRIDE; i++) {
             n = start + (i * STRIDE + k) ;
             if (x[n] % 2 == 0)
@@ -206,11 +210,11 @@ void * pcountBadMA(void *p)
    }
    count[myid] = mycount[myid];
    mycount[myid] = n;
-   totalcount += count[myid];           // ideally should use locks
+   totalcount += count[myid]; // ideally should use locks
 }
 
-//------------------------------------------
-float elapsed_time_msec(struct timespec *begin, struct timespec *end, long *sec, long *nsec)
+float elapsed_time_msec(struct timespec *begin,
+                        struct timespec *end, long *sec, long *nsec)
 {
    if (end->tv_nsec < begin->tv_nsec) {
       *nsec = 1000000000 - (begin->tv_nsec - end->tv_nsec);
