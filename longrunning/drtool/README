@@ -1,0 +1,7 @@
+# Configure
+
+cmake -DDynamoRIO_DIR=/path/to/DynamoRIO-Linux/cmake ../
+
+# Run
+
+/path/to/DynamoRIO-Linux/bin64/drrun -c libperfclient.so -- ./counting 2
