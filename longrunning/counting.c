@@ -95,7 +95,7 @@ int main(int argc, char **argv)
          for (i=0; i < N; i++)
             x[i] = random(); // not optimized
 
-         printf ("%d:PHASE=%s:START=%d:", j + 1, typeName, time(NULL));
+         printf ("%d:PHASE=%s:START=%ld:", j + 1, typeName, time(NULL));
 
          GET_TIME(t1);
          for (i = 0; i < numthreads; i++) {
@@ -136,7 +136,7 @@ int main(int argc, char **argv)
                continue;
             }
 
-         printf ("END=%d:Time=%f\n", time(NULL), comp_time);
+         printf ("END=%ld:Time=%f\n", time(NULL), comp_time);
          //printf(MSG, N, numthreads, comp_time, 100.0*comp_time/total_time);
       }
    return 0;
