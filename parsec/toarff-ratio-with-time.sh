@@ -28,7 +28,7 @@ echo '@relation performance_data_for_parsec_benchmark
 @data'
 
 sed -e 's/#P/P/g' -e '/^$\|^Swaption\|^PARSEC\|^read\|^Number\|^yuv4mpeg\|^encoded\|^ Performance/d' \
-    -e 's/<not counted>/0/g' -e 's/,//g' "$DATAFILE"  | \
+    -e '/([0-9]*,[0-9]*)/d' -e 's/<not counted>/0/g' -e 's/,//g' "$DATAFILE"  | \
 
 awk 'BEGIN{
   FS="[ \t]+";
