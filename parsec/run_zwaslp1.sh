@@ -40,7 +40,7 @@ for program in $programs
 do
 if [ $program = "canneal" ] || [ $program = "dedup" ] || [ $program = "streamcluster" ]
 then
-bmdir="${PARSEC_DIR}/${benchdir}/kernel/${program}"
+bmdir="${PARSEC_DIR}/${benchdir}/kernels/${program}"
 else
 bmdir="${PARSEC_DIR}/${benchdir}/apps/${program}"
 fi
