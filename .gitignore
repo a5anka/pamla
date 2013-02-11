@@ -1,5 +1,6 @@
 *.log
 *.class
 *.tar.gz
+*.o
 data
 build
