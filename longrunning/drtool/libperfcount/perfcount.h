@@ -6,6 +6,16 @@
 #include <string.h>
 #include <linux/perf_event.h>
 #include <asm/unistd.h>
+#include <inttypes.h>
+#include <stdint.h>
+
+typedef uint64_t u64;
+
+struct read_format {
+   u64 value;         /* The value of the event */
+   u64 time_enabled;  /* Perf total time enabled */
+   u64 time_running;  /* Perf total time running */
+};
 
 int initialize_counter (const __u32 event_type,const __u64 event_code);
 void start_counter (const int fd);

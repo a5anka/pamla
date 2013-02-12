@@ -8,6 +8,7 @@ int initialize_counter(const __u32 event_type,const __u64 event_code)
    pe.type = event_type;
    pe.size = sizeof(struct perf_event_attr);
    pe.config = event_code;
+   pe.read_format = 3;
    pe.disabled = 1;
    pe.exclude_kernel = 1;
    pe.exclude_hv = 1;
