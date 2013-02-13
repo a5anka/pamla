@@ -8,6 +8,7 @@ void start_perf();
 void stop_perf();
 
 int thread_count;
+void *count_mutex;
 
 DR_EXPORT void dr_init(client_id_t id)
 {
@@ -18,6 +19,8 @@ DR_EXPORT void dr_init(client_id_t id)
    dr_register_thread_exit_event (event_thread_exit);
 
    print_to_err("DR Client is starting... \n");
+
+   count_mutex = dr_mutex_create();
 }
 
 void event_exit(void)
@@ -27,20 +30,22 @@ void event_exit(void)
 
 void event_thread_init(void *drcontext)
 {
-   if (thread_count == 1)
+   dr_mutex_lock(count_mutex);
+   if (thread_count++ == 1)
       {
          start_perf();
       }
-   ++thread_count;
+   dr_mutex_unlock(count_mutex);
 }
 
 void event_thread_exit(void *drcontext)
 {
-   --thread_count;
-   if (thread_count == 1)
+   dr_mutex_lock(count_mutex);
+   if (--thread_count == 1)
       {
          stop_perf();
       }
+   dr_mutex_unlock(count_mutex);
 }
 
 void start_perf()
