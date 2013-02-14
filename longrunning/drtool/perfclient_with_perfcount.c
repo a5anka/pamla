@@ -53,7 +53,7 @@ DR_EXPORT void dr_init(client_id_t id)
 
 void event_exit(void)
 {
-   struct read_format results;
+   //struct read_format results;
 
    stop_counter(fd1);
    stop_counter(fd2);
@@ -72,7 +72,21 @@ void event_exit(void)
    stop_counter(fd15);
    stop_counter(fd16);
 
-   read(fd1, &results.value, sizeof(struct read_format));
+    struct output out;
+
+    out = get_output(fd1);
+    printf("\nInstructions retired (0x00c0) %" PRIu64
+          " %"PRIu64" (%f%%)\n",
+          out.value, out.scaled_value,out.scale);
+
+    out = get_output(fd2);
+    printf("\nEvent () %" PRIu64
+          " %"PRIu64" (%f%%)\n",
+          out.value, out.scaled_value,out.scale);
+
+
+/*
+   read(fd1, &results, sizeof(struct read_format));
    printf("\nInstructions retired (0x00c0) %" PRIu64
           " (%f%%)\n",
           results.value, results.time_running*100.0/results.time_enabled);
@@ -136,7 +150,7 @@ void event_exit(void)
    printf("Event (0x02a2) %" PRIu64
           " (%f%%)\n\n",
           results.value, results.time_running*100.0/results.time_enabled);
-
+*/
    print_to_err("DR Client is exiting...\n");
 }
 

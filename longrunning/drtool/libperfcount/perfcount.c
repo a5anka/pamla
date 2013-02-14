@@ -41,3 +41,16 @@ int perf_event_open( struct perf_event_attr *hw_event, pid_t pid,
    return syscall( __NR_perf_event_open, hw_event, pid, cpu,
                    group_fd, flags );
 }
+
+struct output get_output(const int fd)
+{
+    struct read_format results;
+    struct output out;
+
+    read(fd, &results, sizeof(struct read_format));
+    out.value = results.value;
+    out.scale = results.time_running*100/results.time_enabled;
+    out.scaled_value = results.value*results.time_enabled/results.time_running;
+    
+    return out;
+}
