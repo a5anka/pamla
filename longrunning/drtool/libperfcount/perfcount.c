@@ -49,8 +49,8 @@ struct output get_output(const int fd)
 
     read(fd, &results, sizeof(struct read_format));
     out.value = results.value;
-    out.scale = results.time_running*100/results.time_enabled;
-    out.scaled_value = results.value*results.time_enabled/results.time_running;
-    
+    out.scale = results.time_running * 100.0 / results.time_enabled;
+    out.scaled_value  = results.value * (results.time_enabled/results.time_running);
+
     return out;
 }
