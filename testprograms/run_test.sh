@@ -13,10 +13,10 @@ matadd=matrixaddition
 cconvert=charconvert
 ccount=charcount
 readwrite=readwrite
-proglist="matrixaddition charconvert charcount readwrite"
+proglist="matrixaddition charconvert2 charcount2"
 nhmBadEvents="r00c0,r0149,r0151,r02a2,r0126,r0227,r0224,r08a2,r01b0,r20f0,r02f1,r01f2,r01b8,r02b8,r04b8,r40cb"	
 events=$nhmBadEvents
-PERF=/usr/bin/perf
+PERF=/usr/local/bin/perf
 threadList1="1 3 4 6 9 12 16"
 threadlistmat="4 8 12 16"
 NlistMatrix="300 600 900 1200 1500 1800"
@@ -36,30 +36,30 @@ do
 
 if [ $prog = "matrixaddition" ]
     then
-        threadlist=$threadlistmat
+        threadList=$threadlistmat
 	SList=$SList1
 	StrideFlag=0
-	Nlist=$NlistMatrix
+	NList=$NlistMatrix
 
 elif [ $prog = "charconvert" ]
    then
-	threadlist=$threadlist1
+	threadList=$threadlist1
 	SList=$SList1
 	StrideFlag=0
-	Nlist=$NlistMatrix
+	NList=$NlistMatrix
 
 elif [ $prog = "readwrite" ]
    then
-	threadlist=$threadlist1
+	threadList=$threadlist1
 	SList=$SList1
 	StrideFlag=0
-	Nlist=$NlistMatrix
-elif [ $prog = "charcount" ]
+	NList=$NlistMatrix
+elif [ $prog = "charcount2" ]
   then
-	threadlist=$threadlist1
+	threadList=$threadlist1
 	SList=$SList1
 	StrideFlag=0
-	Nlist=$NlistMatrix
+	NList=$NlistMatrix
 fi
 
 for N in $NList
@@ -75,21 +75,21 @@ for N in $NList
 		echo "# prog=$prog: N=$N : R=$R : numThreads=$numThreads : ---------------------"
             	echo "#"
             	gcc -DGOOD -DN=$N -DREPEAT=$R $SRC $MCMODEL -lpthread -lrt -o $EXEGOOD
-		sudo $PERF stat -x : -r 3 -e $events ./$EXEGOOD $numThreads
+		sudo $PERF stat  -r 3 -e $events ./$EXEGOOD $numThreads
             	rm ./$EXEGOOD
             	echo "#"
             	gcc -DBAD_FS -DN=$N -DREPEAT=$R $SRC $MCMODEL -lpthread -lrt -o $EXEBAD_FS
-		sudo $PERF stat -x : -r 3 -e $events ./$EXEBAD_FS $numThreads
+		sudo $PERF stat  -r 3 -e $events ./$EXEBAD_FS $numThreads
             	rm ./$EXEBAD_FS
-		if [ $prog = "charconvert" ] ; then
+		if [ $prog = "charconvert2" ] ; then
                 gcc -DBAD_MA -DN=$N -DREPEAT=$R $SRC $MCMODEL -lpthread -lrt -o $EXEBAD_MA
- 		sudo $PERF stat -x : -r 3 -e $events ./$EXEBAD_MA $numThreads
+ 		sudo $PERF stat  -r 3 -e $events ./$EXEBAD_MA $numThreads
                 rm ./$EXEBAD_MA
                 echo "#"
 		fi
-		if [ $prog = "charcount" ] ; then
+		if [ $prog = "charcoun2t" ] ; then
                 gcc -DBAD_MA -DN=$N -DREPEAT=$R $SRC $MCMODEL -lpthread -lrt -o $EXEBAD_MA
- 		sudo $PERF stat -x : -r 3 -e $events ./$EXEBAD_MA $numThreads
+ 		sudo $PERF stat  -r 3 -e $events ./$EXEBAD_MA $numThreads
                 rm ./$EXEBAD_MA
                 echo "#"
 		fi
