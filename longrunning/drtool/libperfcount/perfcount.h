@@ -9,6 +9,8 @@
 #include <inttypes.h>
 #include <stdint.h>
 
+#define DEFAULT_PID 0
+
 typedef uint64_t u64;
 
 struct read_format {
@@ -23,7 +25,7 @@ struct output{
     float scale;
 };
 
-int initialize_counter (const __u32 event_type,const __u64 event_code);
+int initialize_counter (const __u32 event_type,const __u64 event_code, const pid_t pid);
 void start_counter (const int fd);
 void stop_counter (const int fd);
 long long read_counter (const int fd);
