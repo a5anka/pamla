@@ -1,5 +1,65 @@
 #include "perfcount.h"
 
+#define GET_ARRAY_SIZE(x) (sizeof(x)/sizeof(x[0]))
+
+struct perfcount_data *  perfcount_initialize_for_pid (pid_t pid)
+{
+   struct perfcount_data * pc_data =
+      (struct perfcount_data *) malloc (sizeof(struct perfcount_data));
+
+   pc_data->nr_events = 0;
+   pc_data->pid = pid;
+
+   return pc_data;
+}
+
+struct perfcount_data *  perfcount_initialize ()
+{
+   return perfcount_initialize_for_pid(DEFAULT_PID);
+}
+
+void perfcount_finalize (struct perfcount_data * pc_data)
+{
+   int i;
+
+   for (i = 0; i < pc_data->nr_events; i++)
+      {
+         close(pc_data->file_descriptors[i]);
+      }
+
+   free(pc_data);
+}
+
+void perfcount_add_event (struct perfcount_data * pc_data,
+                          const __u32 event_type,const __u64 event_code)
+{
+   pc_data->file_descriptors[pc_data->nr_events] =
+      initialize_counter(event_type, event_code, pc_data->pid);
+
+   ++pc_data->nr_events;
+}
+
+void perfcount_start(struct perfcount_data * pc_data)
+{
+   int i;
+
+   for (i = 0; i < pc_data->nr_events; i++)
+      {
+         start_counter(pc_data->file_descriptors[i]);
+         assert(pc_data->file_descriptors[i] >= 0);
+      }
+}
+
+void perfcount_stop(struct perfcount_data * pc_data)
+{
+   int i;
+
+   for (i = 0; i < pc_data->nr_events; i++)
+      {
+         stop_counter(pc_data->file_descriptors[i]);
+      }
+}
+
 int initialize_counter(const __u32 event_type,const __u64 event_code, const pid_t pid)
 {
    struct perf_event_attr pe;
