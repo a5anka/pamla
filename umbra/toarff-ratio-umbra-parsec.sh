@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-DATAFILE="/tmp/test.out"
+DATAFILE=$1
 
 LINES=22
 
