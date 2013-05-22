@@ -6,8 +6,8 @@ class psumscalar extends Thread {
 	private static final int DATASIZE = 4;
 	private static final int MAXTHREADS = CACHELINE / DATASIZE;
 
-	private static final boolean GOOD = false;
-	private static final boolean BAD_FS = true;
+	private static final boolean GOOD = true;
+	private static final boolean BAD_FS = false;
 
 	public static int[] psum = new int[MAXTHREADS]; // partial sum computed by
 														// each thread

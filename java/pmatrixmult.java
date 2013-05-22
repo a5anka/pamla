@@ -1,14 +1,16 @@
 class pmatrixmult extends Thread {
 
-	private static final int N = 100000000;
+	private static final int N = 1000;
 	private static final int STRIDE = 13;
 	private static final int CACHELINE = 64; // size of cacheline is 64 bytes
 	private static final int DATASIZE = 4;
 	private static final int MAXTHREADS = CACHELINE / DATASIZE;
 
-	private static final boolean GOOD = false;
-	private static final boolean BAD_MA = true;
-	private static final boolean BAD_FS = true;
+	private static final boolean GOOD = true;
+	private static final boolean BAD_MA = false;
+	private static final boolean BAD_FS = false ;
+	
+	private static final boolean CHECK = true;
 
 	// global variables
 	public static int localSumtotal = 0;
@@ -18,6 +20,7 @@ class pmatrixmult extends Thread {
 	public static int[][] A = new int[N][N];
 	public static int[][] B = new int[N][N];
 	public static int[][] C = new int[N][N];
+	public static int[][] Cp = new int[N][N];
 
 	public static void main(String[] args) {
 
@@ -25,8 +28,8 @@ class pmatrixmult extends Thread {
 		int i, tId[];
 		Thread threads[];
 
-		long t1 = System.currentTimeMillis();
-
+		long t0 = System.currentTimeMillis();
+		
 		if (args.length != 1) {
 			System.out.println("Usage:java pmatrixmult <numthreads>");
 			System.exit(0);
@@ -43,7 +46,7 @@ class pmatrixmult extends Thread {
 		tId = new int[MAXTHREADS];
 		threads = new Thread[MAXTHREADS];
 
-		long t2 = System.currentTimeMillis();
+		long t1 = System.currentTimeMillis();
 
 		for (i = 0; i < numthreads; i++) {
 			tId[i] = i;
@@ -64,25 +67,34 @@ class pmatrixmult extends Thread {
 			}
 		}
 
-		long t3 = System.currentTimeMillis();
+		long t2 = System.currentTimeMillis();
 
-		for (int j = 0; j < numthreads; j++) {
-			result += plocalSum[j];
+		if(CHECK){
+			int error = 0;
+			for ( i=0; i < N; i++) {
+				for (int j=0; j < N; j++) {
+					Cp[i][j]= 0;
+					for (int k=0; k < N; k++)
+						Cp[i][j] += A[i][k]*B[k][j];
+					if (Cp[i][j] != C[i][j])
+						error++;
+				}
+			}
+			if (error>0)
+				System.out.println("# Error! : count = %d *************"+error);
 		}
 
-		if (result != localSumtotal)
-			System.out.println("# Error! : result=" + result + ", localSumtotal="
-					+ localSumtotal);
-
-		long comp_time = t3 - t2;
-		long total_time = t3 - t1;
+		long t3 = System.currentTimeMillis();
+		
+		long comp_time = t2 - t1;
+		long total_time = t3 - t0;
 
 		if (BAD_FS) {
 			if (numthreads == 1) {
 				System.out.println("# PMatrixMult: GOOD : N=" + N
 						+ " : Threads=" + numthreads + " : CompTime(ms)="
 						+ comp_time + " : CompTime/TotalTime="
-						+ (comp_time / total_time) * 100);
+						+ (comp_time*100 / total_time)+"%");
 			}
 		}
 
@@ -91,7 +103,7 @@ class pmatrixmult extends Thread {
 					.println("# PMatrixMult: Bad-FS : N=" + N + " : Threads="
 							+ numthreads + " : CompTime(ms)=" + comp_time
 							+ " : CompTime/TotalTime="
-							+ (comp_time / total_time) * 100);
+							+ (comp_time *100/ total_time)+"%");
 		}
 
 		if (GOOD) {
@@ -99,18 +111,26 @@ class pmatrixmult extends Thread {
 					.println("# PMatrixMult: GOOD : N=" + N + " : Threads="
 							+ numthreads + " : CompTime(ms)=" + comp_time
 							+ " : CompTime/TotalTime="
-							+ (comp_time / total_time) * 100);
+							+ (comp_time *100 / total_time)+"%");
+		}
+		
+		if (BAD_MA) {
+			System.out
+					.println("# PMatrixMult: BAD_MA : N=" + N + " : Threads="
+							+ numthreads + " : CompTime(ms)=" + comp_time
+							+ " : CompTime/TotalTime="
+							+ (comp_time *100 / total_time)+"%");
 		}
 
 	}
 
 	public void run() {
 		int tId = Integer.parseInt(this.getName());
-		long start = tId * N / numthreads;
-		long end = (tId + 1) * N / numthreads;
+		int start = tId * N / numthreads;
+		int end = (tId + 1) * N / numthreads;
 		int localSum[] = new int[MAXTHREADS];
 
-		for (int j = (int) start; j < (int) end; j++) {
+		for (int j = start; j < end; j++) {
 			for (int i = 0; i < N; i++) {
 				if (GOOD) {
 					localSum[tId] = 0;
