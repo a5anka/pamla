@@ -13,8 +13,8 @@ public class pdotproduct_BAD_MA extends Thread {
 	public static int sumtotal = 0;
 	public static int numthreads;
 
-	public static int[] v1 = new int[N];
-	public static int[] v2 = new int[N];
+	public static int[] v1;// new int[N];
+	public static int[] v2;// = new int[N];
 
 	public static void main(String[] args) {
 
@@ -24,7 +24,7 @@ public class pdotproduct_BAD_MA extends Thread {
 
 		long t0 = System.currentTimeMillis();
 
-		if (args.length != 3) {
+		if (args.length != 4) {
 			System.out
 					.println("Usage:java psumscalar <numthreads> <N> <REPEAT> <STRIDE>");
 			System.exit(0);
@@ -34,6 +34,9 @@ public class pdotproduct_BAD_MA extends Thread {
 		REPEAT = Integer.parseInt(args[2]);
 		STRIDE = Integer.parseInt(args[3]);
 
+		v1 = new int[N];
+		v2 = new int[N];
+		
 		if (numthreads > MAXTHREADS) {
 			System.out.println("numthreads > MAXTHREADS " + MAXTHREADS);
 			System.exit(0);

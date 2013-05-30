@@ -15,10 +15,10 @@ public class pmatrixmult_BAD_FS extends Thread {
 	public static int[] plocalSum = new int[MAXTHREADS]; // partial localSum
 															// computed by
 	// each thread
-	public static int[][] A = new int[N][N];
-	public static int[][] B = new int[N][N];
-	public static int[][] C = new int[N][N];
-	public static int[][] Cp = new int[N][N];
+	public static int[][] A;
+	public static int[][] B;
+	public static int[][] C;
+	public static int[][] Cp;
 
 	public static void main(String[] args) {
 
@@ -28,9 +28,9 @@ public class pmatrixmult_BAD_FS extends Thread {
 
 		long t0 = System.currentTimeMillis();
 
-		if (args.length != 3) {
+		if (args.length != 4) {
 			System.out
-					.println("Usage:java psumscalar <numthreads> <N> <REPEAT> <STRIDE>");
+					.println("Usage:java pmatrixmult <numthreads> <N> <REPEAT> <STRIDE>");
 			System.exit(0);
 		}
 		numthreads = Integer.parseInt(args[0]);
@@ -38,6 +38,11 @@ public class pmatrixmult_BAD_FS extends Thread {
 		REPEAT = Integer.parseInt(args[2]);
 		STRIDE = Integer.parseInt(args[3]);
 
+		A = new int[N][N];
+		B = new int[N][N];
+		C = new int[N][N];
+		Cp = new int[N][N];
+		
 		init_matrix(A, 1);
 		init_matrix(B, 2);
 
