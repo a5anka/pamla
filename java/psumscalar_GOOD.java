@@ -1,16 +1,13 @@
-class psumscalar extends Thread {
+public class psumscalar_GOOD extends Thread {
 
-	private static final int N = 100000000;
-	private static final int REPEAT = 10;
+	private static int N = 100000000;
+	private static int REPEAT = 10;
 	private static final int CACHELINE = 64; // size of cacheline is 64 bytes
 	private static final int DATASIZE = 4;
 	private static final int MAXTHREADS = CACHELINE / DATASIZE;
 
-	private static final boolean GOOD = true;
-	private static final boolean BAD_FS = false;
-
 	public static int[] psum = new int[MAXTHREADS]; // partial sum computed by
-														// each thread
+													// each thread
 
 	public static int sumtotal = 0;
 	public static int numthreads;
@@ -23,11 +20,14 @@ class psumscalar extends Thread {
 
 		long t1 = System.currentTimeMillis();
 
-		if (args.length != 1) {
-			System.out.println("Usage:java psumscalar <numthreads>");
+		if (args.length != 3) {
+			System.out
+					.println("Usage:java psumscalar <numthreads> <N> <REPEAT>");
 			System.exit(0);
 		}
 		numthreads = Integer.parseInt(args[0]);
+		N = Integer.parseInt(args[1]);
+		REPEAT = Integer.parseInt(args[2]);
 
 		if (numthreads > MAXTHREADS) {
 			System.out.println("numthreads > MAXTHREADS " + MAXTHREADS);
@@ -43,7 +43,7 @@ class psumscalar extends Thread {
 			myid[i] = i;
 			psum[i] = 0;
 
-			psumscalar t = new psumscalar();
+			psumscalar_GOOD t = new psumscalar_GOOD();
 			threads[i] = t;
 			t.setName("" + i);
 			t.start();
@@ -59,7 +59,7 @@ class psumscalar extends Thread {
 		}
 
 		long t3 = System.currentTimeMillis();
-		
+
 		for (int j = 0; j < numthreads; j++) {
 			result += psum[j];
 		}
@@ -71,26 +71,10 @@ class psumscalar extends Thread {
 		long comp_time = t3 - t2;
 		long total_time = t3 - t1;
 
-		if (BAD_FS) {
-			if (numthreads == 1) {
-				System.out.println("# PSumScalar: GOOD : N=" + N + " : Threads="
-						+ numthreads + " : CompTime(ms)=" + comp_time
-						+ " : CompTime/TotalTime=" + (comp_time / total_time) * 100);
-			}
-		}
+		System.out.println("# PSumScalar: GOOD : N=" + N + " : Threads="
+				+ numthreads + " : CompTime(ms)=" + comp_time
+				+ " : CompTime/TotalTime=" + (comp_time / total_time) * 100);
 
-		if(BAD_FS){
-			System.out.println("# PSumScalar: Bad-FS : N=" + N + " : Threads="
-					+ numthreads + " : CompTime(ms)=" + comp_time
-					+ " : CompTime/TotalTime=" + (comp_time / total_time) * 100);
-		}
-		
-		if(GOOD){
-			System.out.println("# PSumScalar: GOOD : N=" + N + " : Threads="
-					+ numthreads + " : CompTime(ms)=" + comp_time
-					+ " : CompTime/TotalTime=" + (comp_time / total_time) * 100);
-		}
-		
 	}
 
 	public void run() {
@@ -101,14 +85,10 @@ class psumscalar extends Thread {
 
 		for (int j = 0; j < REPEAT; j++) {
 			for (int i = (int) start; i < (int) end; i++) {
-				if (GOOD)
-					localSum[tId] += i % 3;
-				else if (BAD_FS)
-					psum[tId] += i % 3; // causes false sharing among threads
+				localSum[tId] += i % 3;
 			}
 		}
-		if (GOOD)
-			psum[tId] = localSum[tId];
+		psum[tId] = localSum[tId];
 
 		sumtotal += psum[tId];
 	}
