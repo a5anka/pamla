@@ -2,6 +2,8 @@
 
 perfEvents="r0149,r0151,r20f0,r04b8"
 
+dd if=/dev/zero of=/dev/null count=1000000000 &
+
 program="dd"
 
 pid=$(pidof $program)
